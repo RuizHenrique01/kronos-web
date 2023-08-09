@@ -1,3 +1,4 @@
+import CreateUser from './pages/CreateUser';
 import Login from './pages/Login'
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -5,8 +6,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path='/' element={<Login />}>
-        </Route>
+        <Route path='auth' element={<Login />}/>
+        <Route path='signup' element={<CreateUser />} />
       </Routes>
     </Router>
   )
