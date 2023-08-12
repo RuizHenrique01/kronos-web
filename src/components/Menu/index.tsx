@@ -8,13 +8,13 @@ import { useLocation, useNavigate } from 'react-router';
 import { Assessment, Logout } from '@mui/icons-material';
 import logo from '../../assets/logo_cronos.png';
 import { AuthenticateService } from '../../services/authenticate.service';
+import { useGetMenuItemState } from '../../store/hooks';
 
 const Menu = () => {
 
     const [toggleMenu, setToggleMenu] = useState<boolean>(true);
     const navigate = useNavigate();
-    //const menuItems = useSelector((state) => state.menuItem.items)
-    const menuItems = { projectId: 1 };
+    const menuItems = useGetMenuItemState();
     const location = useLocation();
     const authService = new AuthenticateService();
 

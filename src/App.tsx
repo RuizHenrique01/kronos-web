@@ -1,10 +1,12 @@
 import CreateUser from './pages/CreateUser';
 import Login from './pages/Login';
 import { RecoilRoot } from 'recoil';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import ResetPassword from './pages/ResetPassword';
 import { SnackbarProvider } from 'notistack';
 import Main from './pages/Main';
+import InitialPage from './pages/InitialPage';
+import ListProjects from './pages/ListProjects';
 
 function App() {
   return (
@@ -17,8 +19,10 @@ function App() {
             <Route path='forgetpassword' element={<ResetPassword />} />
 
             <Route path='' element={<Main />}>
+              <Route path='' element={<Navigate to={'inicio'} />} />
+              <Route path='inicio' element={<InitialPage />} />
               <Route path='projetos'>
-                {/* <Route path='' element={<ListProjects />} /> */}
+                <Route path='' element={<ListProjects />} />
               </Route>
             </Route>
           </Routes>
