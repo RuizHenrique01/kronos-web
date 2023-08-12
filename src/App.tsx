@@ -7,6 +7,8 @@ import { SnackbarProvider } from 'notistack';
 import Main from './pages/Main';
 import InitialPage from './pages/InitialPage';
 import ListProjects from './pages/ListProjects';
+import MessageCreateProject from './pages/MessageCreateProject';
+import CreateProject from './pages/CreateProject';
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
               <Route path='inicio' element={<InitialPage />} />
               <Route path='projetos'>
                 <Route path='' element={<ListProjects />} />
+                <Route path='primeiro' element={<MessageCreateProject />} />
+                <Route path='criar' element={<CreateProject />} />
               </Route>
             </Route>
           </Routes>

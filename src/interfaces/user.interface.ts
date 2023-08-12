@@ -8,3 +8,12 @@ export interface IUser {
     token?: string | null;
     password?: string;
 }
+
+export interface IUsersIntegrated {
+    id: number;
+    userId: number;
+    projectId: number;
+    createdAt: string;
+    updatedAt: string;
+    Users: IUser
+}
