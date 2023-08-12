@@ -76,6 +76,7 @@
 .login__input input::placeholder {
     color: white;
     font-size: 17px;
+    opacity: .7;
 }
 
 .login__forgetPassword {

@@ -1,6 +1,6 @@
 //import jwt from 'jwt-decode';
 import api from '../api';
-import { IAuth } from '../interfaces';
+import { IAuth, IUser } from '../interfaces';
 
 export class AuthenticateService {
 
@@ -20,20 +20,20 @@ export class AuthenticateService {
         }
     }
 
-    // async createUser({ name, lastName, email, password, phone = "99999999999" }) {
-    //     try {
-    //         const created = await api.post('/auth/signup', {
-    //             name,
-    //             lastName,
-    //             email,
-    //             password,
-    //             phone
-    //         });
-    //         return created;
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
+    async createUser({ name, lastName, email, password, phone = "99999999999" }: IUser) {
+        try {
+            const created = await api.post('/auth/signup', {
+                name,
+                lastName,
+                email,
+                password,
+                phone
+            });
+            return created;
+        } catch (error) {
+            throw new Error('Falha ao na criação do Usuário!');
+        }
+    }
 
     setToken(token: string) {
         localStorage.removeItem('token');
@@ -65,7 +65,7 @@ export class AuthenticateService {
         return localToken;
     }
 
-    // logout() {
-    //     localStorage.removeItem('token');
-    // }
+    logout() {
+        localStorage.clear();
+    }
 }

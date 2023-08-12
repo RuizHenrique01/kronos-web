@@ -26,7 +26,6 @@ const Login = () => {
   const authenticateService = new AuthenticateService();
   const userService = new UserService();
 
-
   const navigate = useNavigate();
 
   function handleEmail(event: React.ChangeEvent<HTMLInputElement>) {
@@ -43,9 +42,8 @@ const Login = () => {
     setSystem({
       loadingSystem: true,
     });
-    
+
     setIsLoading(true);
-    console.log('login')
 
     authenticateService.authentication({
       email: user.email,

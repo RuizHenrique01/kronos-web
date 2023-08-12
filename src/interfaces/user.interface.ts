@@ -1,9 +1,10 @@
 export interface IUser {
-    id: number;
+    id?: number;
     name: string;
     lastName: string;
     email: string;
     phone: string;
-    isAuthenticated: boolean;
-    token: string | null;
+    isAuthenticated?: boolean;
+    token?: string | null;
+    password?: string;
 }

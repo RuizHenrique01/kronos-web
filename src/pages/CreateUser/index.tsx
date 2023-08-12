@@ -1,164 +1,172 @@
 import { AccountCircle, Email, Lock } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 import classNames from 'classnames';
 import styles from './createUser.module.css'
+import { useState } from 'react';
+import { AuthenticateService } from '../../services/authenticate.service';
+import { UserService } from '../../services/user.service';
+import { enqueueSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
+import { useSetSystemState, useSetUserState } from '../../store/hooks';
+import InputError from '../../components/InputError';
 
 const CreateUser = () => {
 
-    // const [name, setName] = useState('');
-    // const [lastName, setLastName] = useState('');
-    // const [email, setEmail] = useState('');
-    // const [password, setPassword] = useState('');
-    // const [date, setDate] = useState(new Date());
-    // const [category, setCategory] = useState('school');
-    // const [isSubmit, setIsSubmit] = useState(false);
-    // const authenticateService = new AuthenticateService();
-    // const userService = new UserService();
-    // const dispatch = useDispatch();
+    const [name, setName] = useState<string>('');
+    const [lastName, setLastName] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [date, setDate] = useState<Date>(new Date());
+    const [category, setCategory] = useState<string>('school');
+    const [isSubmit, setIsSubmit] = useState<boolean>(false);
+    const authenticateService = new AuthenticateService();
+    const userService = new UserService();
 
-    // const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // const emailRegex = new RegExp(/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/);
-    // const passwordRegex = new RegExp(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{6,}$/);
+    const emailRegex = new RegExp(/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/);
+    const passwordRegex = new RegExp(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{6,}$/);
 
-    // const navigate = useNavigate();
+    const setSystem = useSetSystemState();
+    const setUserState = useSetUserState();
 
-    // const handleSubimit = (event) => {
+    const navigate = useNavigate();
 
-    //     event.preventDefault();
-    //     setIsSubmit(true);
-    //     setIsLoading(true);
+    const handleSubimit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setIsSubmit(true);
+        setIsLoading(true);
 
-    //     authenticateService.createUser({
-    //         name,
-    //         lastName,
-    //         email,
-    //         password
-    //     }).then(response => {
-    //         authenticateService.setToken({ token: response.data.token });
-    //         dispatch(setLoadingSystem(true));
+        authenticateService.createUser({
+            name,
+            lastName,
+            email,
+            password,
+            phone: "99999999999"
+        }).then(response => {
+            authenticateService.setToken(response.data.token);
+            setSystem({
+                loadingSystem: true
+            });
 
-    //         userService.getUser()
-    //             .then((user) => {
+            userService.getUser()
+                .then((user) => {
 
-    //                 console.log(user);
+                    console.log(user);
 
-    //                 dispatch(setUserAuthentication({
-    //                     user: {
-    //                         id: user.id,
-    //                         name: user.name,
-    //                         lastName: user.lastName,
-    //                         email: user.email,
-    //                         phone: user.phone
-    //                     },
-    //                     isAuthenticated: true,
-    //                     token: authenticateService.getToken()
-    //                 }))
+                    setUserState({
+                        id: user.id,
+                        name: user.name,
+                        lastName: user.lastName,
+                        email: user.email,
+                        phone: user.phone,
+                        isAuthenticated: true,
+                        token: authenticateService.getToken()
+                    });
 
-    //                 dispatch(setLoadingSystem(false));
+                    setSystem({
+                        loadingSystem: false
+                    });
 
-    //             })
-    //             .catch(error => {
-    //                 localStorage.removeItem('token');
-    //                 dispatch(clearUserAuthentication());
-    //                 navigate('/auth');
-    //                 enqueueSnackbar('Houve um error ao obter informações do usuário', {
-    //                     variant: 'error'
-    //                 });
-
-    //                 console.error(error);
-    //             })
-    //             .finally(() => {
-    //                 setIsLoading(false);
-    //             });
+                })
+                .catch(() => {
+                    localStorage.clear();
+                    navigate('/auth');
+                    enqueueSnackbar('Houve um error ao obter informações do usuário', {
+                        variant: 'error'
+                    });
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
 
 
-    //         navigate('/projetos/primeiro');
-    //     }).catch(erro => {
-    //         enqueueSnackbar('Falha ao cadastrar usuário.', {
-    //             variant: 'error'
-    //         })
-    //     }).finally(() => {
-    //         setIsLoading(false);
-    //     });
-    // }
+            navigate('/projetos/primeiro');
+        }).catch(() => {
+            enqueueSnackbar('Falha ao cadastrar usuário.', {
+                variant: 'error'
+            })
+        }).finally(() => {
+            setIsLoading(false);
+        });
+    }
 
     return (<div className={styles.background_signup}>
-        <form >
+        <form onSubmit={(e) => handleSubimit(e)}>
             <legend className={styles.signup_form_title}>CADASTRE-SE AQUI</legend>
             {/* Input Nome */}
 
             <div className={classNames({
                 [styles.background_signup_container]: true,
-                [styles.background_signup_container_error]: false
+                [styles.background_signup_container_error]: (isSubmit && !name)
             })}>
                 <AccountCircle className={styles.background_signup_icon} />
-                <input type='text' name='name' className={styles.background_signup_input} placeholder='Nome' />
+                <input type='text' value={name} onChange={(e) => setName(e.target.value)} name='name' className={styles.background_signup_input} placeholder='Nome' />
             </div>
-            {/* {(isSubmit && !name) && <div className={styles.input_error}>
+            {(isSubmit && !name) && <div className={styles.input_error}>
                 <InputError>Preencha o campo Nome!</InputError>
-            </div>} */}
+            </div>}
             {/* Input SobreNome */}
             <div className={classNames({
                 [styles.background_signup_container]: true,
-                [styles.background_signup_container_error]: false
+                [styles.background_signup_container_error]: (isSubmit && !lastName)
             })}>
                 <AccountCircle className={styles.background_signup_icon} />
-                <input type='text'  name='lastName' className={styles.background_signup_input} placeholder='Sobrenome' />
+                <input type='text' value={lastName} onChange={(e) => setLastName(e.target.value)} name='lastName' className={styles.background_signup_input} placeholder='Sobrenome' />
             </div>
-            {/* {(isSubmit && !lastName) && <div className={styles.input_error}>
+            {(isSubmit && !lastName) && <div className={styles.input_error}>
                 <InputError>Preencha o campo Sobrenome!</InputError>
-            </div>} */}
+            </div>}
 
             {/* Input Email */}
             <div className={classNames({
                 [styles.background_signup_container]: true,
-                [styles.background_signup_container_error]: false
+                [styles.background_signup_container_error]: (isSubmit && !email) || (isSubmit && !emailRegex.test(email))
             })}>
                 <Email className={styles.background_signup_icon} />
-                <input type='email'  name='email' className={styles.background_signup_input} placeholder='Email' />
+                <input type='email' value={email} onChange={(e) => setEmail(e.target.value)} name='email' className={styles.background_signup_input} placeholder='Email' />
             </div>
-            {/* {(isSubmit && !email) && <div className={
+            {(isSubmit && !email) && <div className={
                 classNames({
                     [styles.input_error]: true,
                     [styles.input_error_first]: true
                 })}>
                 <InputError>Preencha o campo Email!</InputError>
-            </div>} */}
-            {/* {(isSubmit && !emailRegex.test(email)) && <div className={styles.input_error}>
+            </div>}
+            {(isSubmit && !emailRegex.test(email)) && <div className={styles.input_error}>
                 <InputError>Insira um email válido!</InputError>
-            </div>} */}
+            </div>}
 
             {/* Input Password */}
             <div className={classNames({
                 [styles.background_signup_container]: true,
-                [styles.background_signup_container_error]: false
+                [styles.background_signup_container_error]: (isSubmit && !password) || (isSubmit && !passwordRegex.test(password))
             })}>
                 <Lock className={styles.background_signup_icon} />
-                <input type='password' name="password" className={styles.background_signup_input} placeholder='Password' />
+                <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} name="password" className={styles.background_signup_input} placeholder='Password' />
             </div>
-            {/* {(isSubmit && !password) && <div className={
+            {(isSubmit && !password) && <div className={
                 classNames({
                     [styles.input_error]: true,
                     [styles.input_error_first]: true
                 })}>
                 <InputError>Preencha o campo Senha!</InputError>
-            </div>} */}
-            {/* {(isSubmit && !passwordRegex.test(password)) && <div className={styles.input_error}>
+            </div>}
+            {(isSubmit && !passwordRegex.test(password)) && <div className={styles.input_error}>
                 <InputError>A senha deve ter no mínimo 6 caracteres, letras maiúsculas, letras minúsculas, numerais e caracteres especiais!</InputError>
-            </div>} */}
+            </div>}
 
             {/* Input Data Nascimento */}
             <label className={styles.background_signup_label}>Data de nascimento:</label>
             <div className={styles.background_signup_container}>
                 <input
                     type='date'
-                    // value={date.getFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2)}
-                    // onChange={(e) => {
-                    //     const newDate = new Date(e.target.value);
-                    //     newDate.setDate(Number(e.target.value.slice(-2)));
-                    //     setDate(newDate);
-                    // }}
+                    value={date.getFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2)}
+                    onChange={(e) => {
+                        const newDate = new Date(e.target.value);
+                        newDate.setDate(Number(e.target.value.slice(-2)));
+                        setDate(newDate);
+                    }}
                     name="birthday" className={styles.background_signup_input} placeholder='25/05/2023' />
             </div>
 
@@ -169,21 +177,21 @@ const CreateUser = () => {
                     <label className={styles.background_signup_label_radio} htmlFor="school">
                         Escola
                     </label>
-                    <input type="radio" id="school" name="category" className={styles.background_signup_radio}  checked={true} />
+                    <input type="radio" id="school" name="category" className={styles.background_signup_radio} onChange={() => setCategory('school')} checked={category === 'school'} />
                 </div>
 
                 <div className={styles.background_signup_container_radio}>
                     <label className={styles.background_signup_label_radio} htmlFor="company">
                         Empresa
                     </label>
-                    <input type="radio" id="company" name="category" className={styles.background_signup_radio} />
+                    <input type="radio" id="company" name="category" className={styles.background_signup_radio} onChange={() => setCategory('company')} />
                 </div>
 
                 <div className={styles.background_signup_container_radio}>
                     <label className={styles.background_signup_label_radio} htmlFor="other">
                         Outro
                     </label>
-                    <input type="radio" name="category" id="other" className={styles.background_signup_radio}  />
+                    <input type="radio" name="category" id="other" className={styles.background_signup_radio} onChange={() => setCategory('other')} />
                 </div>
             </div>
 
@@ -194,7 +202,7 @@ const CreateUser = () => {
                 Ao clicar em Cadastre-se, você concorda com nossos <a className={styles.background_signup_span_link} href='#'>Termos, Política de Privacidade e Política de Cookies.</a> Você poderá receber notificações por SMS e cancelar isso quando quiser.
             </span>
 
-            <Button type='submit' sx={{
+            <Button disabled={isLoading} type='submit' sx={{
                 color: 'white',
                 borderColor: 'white',
                 margin: 2,
@@ -203,7 +211,7 @@ const CreateUser = () => {
                     backgroundColor: 'rgba(255,255,255,0.2)'
                 }
             }} variant="outlined">
-                {/* {
+                {
                     isLoading ?
                         <Box sx={{
                             display: 'flex',
@@ -217,9 +225,8 @@ const CreateUser = () => {
                                 color: '#FFF',
                             }} />
                         </Box>
-                        : 
-                    } */}
-                    <span>Cadastre-se</span>
+                        : <span>Cadastre-se</span>
+                }
             </Button>
         </form>
     </div>)
