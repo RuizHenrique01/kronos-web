@@ -1,34 +1,32 @@
-import { Outlet, useNavigate } from "react-router";
+import { Outlet } from "react-router";
 import Menu from "../../components/Menu";
 import Navbar from "../../components/Navbar";
 import styles from './main.module.css';
-import { useDispatch, useSelector } from "react-redux";
-import { setLoadingSystem } from "../../store/slices/system.slice";
 import { useEffect } from "react";
 import { Box, CircularProgress, Dialog, DialogContent } from "@mui/material";
+import { useGetSystemState, useGetUserState, useSetSystemState } from "../../store/hooks";
 
 const Main = () => {
 
-    // const systemState = useSelector(state => state.system);
-    // const authState = useSelector(state => state.auth);
-    // const dispatch = useDispatch();
+    const systemState = useGetSystemState();
+    const authState = useGetUserState();
+    const setSystem = useSetSystemState();
   
-    // useEffect(() => {
-
-    //     // console.log(systemState);
-
-    //   if (authState.isAuthenticated && systemState.loadingSystem) {
-    //     setTimeout(() => {
-    //         dispatch(setLoadingSystem(false));
-    //     }, 1000)
-    //   }
-    // }, [authState])
+    useEffect(() => {
+      if (authState.isAuthenticated && systemState.loadingSystem) {
+        setTimeout(() => {
+            setSystem({
+                loadingSystem: false
+            });
+        }, 1000)
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authState, systemState])
 
     return (
         <>
             <Dialog 
-                //open={systemState.loadingSystem}
-                open={false}
+                open={systemState.loadingSystem}
                 >
                 <DialogContent
                     sx={{
@@ -59,16 +57,16 @@ const Main = () => {
                 </DialogContent>
             </Dialog>
 
-            {/* {
-                !systemState.loadingSystem && */}
+            {
+                !systemState.loadingSystem &&
                 <main className={styles.layout_container}>
-                    {/* <Menu id={2} /> */}
+                    <Menu />
                     <section className={styles.layout_section} >
-                        {/* <Navbar /> */}
+                        <Navbar />
                         <Outlet></Outlet>
                     </section>
                 </main>
-            {/* } */}
+            }
         </>
     )
 }

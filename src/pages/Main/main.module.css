@@ -1,0 +1,16 @@
+.layout_container {
+    display: flex;
+
+    width: 100%;
+
+    height: 100vh;
+    overflow: hidden;
+}
+
+.layout_container .layout_section {
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+    width: 100%;
+}
