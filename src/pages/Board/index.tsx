@@ -3,7 +3,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button, CircularProgress, Dialog, DialogContent } from '@mui/material';
 import { useEffect, useState } from "react";
 import { useParams } from 'react-router';
-import BoardCard from "../../components/Card";
 import styles from "./boards.module.css";
 import TaskForm from '../../components/TaskForm';
 import { enqueueSnackbar } from 'notistack';
@@ -13,6 +12,7 @@ import { IBoard, IProject, ITask } from '../../interfaces';
 import { ProjectsService } from '../../services/project.service';
 import { BoardsService } from '../../services/board.service';
 import { TasksService } from '../../services/task.service';
+import BoardCard from '../../components/BoardCard';
 
 const Boards = () => {
 
@@ -257,7 +257,7 @@ const Boards = () => {
                       title='EDITE SUA TAREFA'
                       buttonText='Editar tarefa'
                       boards={boards}
-                      users={project.UsersIntegrated}
+                      users={project?.UsersIntegrated}
                       handleSubmit={editTask}
                       editableTask={currentEditableTask}
                     />
@@ -292,7 +292,7 @@ const Boards = () => {
                     :
                     <TaskForm
                       boards={boards}
-                      users={project.UsersIntegrated}
+                      users={project?.UsersIntegrated}
                       handleSubmit={createTask}
                     />
                 }
@@ -340,7 +340,7 @@ const Boards = () => {
                     openEditTask={(task: ITask) => handleEditTask(task)} // Em breve ajeitar todos os props-drilling
                     key={board.id}
                     title={board.name}
-                    tasks={board.Tasks}
+                    tasks={board.Tasks!}
                   />
                 )) : null
               }
