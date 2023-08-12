@@ -4,7 +4,17 @@
   margin: 0;
 }
 
-body{
+body {
   font-family: 'Open Sans', sans-serif;
   background-color: #85B0B0;
+}
+
+:root {
+  --login-bg-color: #043434;
+  --primary-color: #002D2B;
+  --main-color: #85B0B0;
+  --mobile: 768px;
+  --desktop_xsm: 980px;
+  --desktop_sm: 1080px;
+  --desktop_md: 1280px;
 }

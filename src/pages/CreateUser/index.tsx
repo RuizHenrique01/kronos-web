@@ -1,9 +1,88 @@
 import { AccountCircle, Email, Lock } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import classNames from 'classnames';
-import styles from './CreateUser.module.scss'
+import styles from './createUser.module.css'
 
 const CreateUser = () => {
+
+    // const [name, setName] = useState('');
+    // const [lastName, setLastName] = useState('');
+    // const [email, setEmail] = useState('');
+    // const [password, setPassword] = useState('');
+    // const [date, setDate] = useState(new Date());
+    // const [category, setCategory] = useState('school');
+    // const [isSubmit, setIsSubmit] = useState(false);
+    // const authenticateService = new AuthenticateService();
+    // const userService = new UserService();
+    // const dispatch = useDispatch();
+
+    // const [isLoading, setIsLoading] = useState(false);
+
+    // const emailRegex = new RegExp(/[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/);
+    // const passwordRegex = new RegExp(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{6,}$/);
+
+    // const navigate = useNavigate();
+
+    // const handleSubimit = (event) => {
+
+    //     event.preventDefault();
+    //     setIsSubmit(true);
+    //     setIsLoading(true);
+
+    //     authenticateService.createUser({
+    //         name,
+    //         lastName,
+    //         email,
+    //         password
+    //     }).then(response => {
+    //         authenticateService.setToken({ token: response.data.token });
+    //         dispatch(setLoadingSystem(true));
+
+    //         userService.getUser()
+    //             .then((user) => {
+
+    //                 console.log(user);
+
+    //                 dispatch(setUserAuthentication({
+    //                     user: {
+    //                         id: user.id,
+    //                         name: user.name,
+    //                         lastName: user.lastName,
+    //                         email: user.email,
+    //                         phone: user.phone
+    //                     },
+    //                     isAuthenticated: true,
+    //                     token: authenticateService.getToken()
+    //                 }))
+
+    //                 dispatch(setLoadingSystem(false));
+
+    //             })
+    //             .catch(error => {
+    //                 localStorage.removeItem('token');
+    //                 dispatch(clearUserAuthentication());
+    //                 navigate('/auth');
+    //                 enqueueSnackbar('Houve um error ao obter informações do usuário', {
+    //                     variant: 'error'
+    //                 });
+
+    //                 console.error(error);
+    //             })
+    //             .finally(() => {
+    //                 setIsLoading(false);
+    //             });
+
+
+    //         navigate('/projetos/primeiro');
+    //     }).catch(erro => {
+    //         enqueueSnackbar('Falha ao cadastrar usuário.', {
+    //             variant: 'error'
+    //         })
+    //     }).finally(() => {
+    //         setIsLoading(false);
+    //     });
+    // }
+
     return (<div className={styles.background_signup}>
         <form >
             <legend className={styles.signup_form_title}>CADASTRE-SE AQUI</legend>

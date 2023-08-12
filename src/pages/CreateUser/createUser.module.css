@@ -1,8 +1,6 @@
-@import '../../styles/variables';
-
 .background_signup {
     width: 100%;
-    background-color: $login-bg-color;
+    background-color: var(--login-bg-color);
     height: 100vh;
     display: flex;
     align-items: center;
