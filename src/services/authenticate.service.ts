@@ -1,5 +1,6 @@
 //import jwt from 'jwt-decode';
 import api from '../api';
+import jwt from 'jwt-decode';
 import { IAuth, IUser } from '../interfaces';
 
 export class AuthenticateService {
@@ -40,22 +41,22 @@ export class AuthenticateService {
         localStorage.setItem('token', token);
     }
 
-    // decodeToken(token) {
-    //     if (!token) return null;
+    decodeToken(token: string) {
+        if (!token) return null;
 
-    //     try {
-    //         const decodeToken = jwt(token);
-    //         return decodeToken;
-    //     } catch (error) {
-    //         return null
-    //     }
-    // }
+        try {
+            const decodeToken = jwt(token);
+            return decodeToken;
+        } catch (error) {
+            return null
+        }
+    }
 
-    // isValidToken(token) {
-    //     if (!token) return false;
+    isValidToken(token: string) {
+        if (!token) return false;
 
-    //     return true;
-    // }
+        return true;
+    }
 
     getToken() {
         const localToken = localStorage.getItem('token');

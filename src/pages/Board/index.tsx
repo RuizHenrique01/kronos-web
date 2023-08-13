@@ -6,13 +6,12 @@ import { useParams } from 'react-router';
 import styles from "./boards.module.css";
 import TaskForm from '../../components/TaskForm';
 import { enqueueSnackbar } from 'notistack';
-import { useDispatch } from 'react-redux';
-import { setProjectNameNavbar } from '../../store/slices/navbar.slice';
 import { IBoard, IProject, ITask } from '../../interfaces';
 import { ProjectsService } from '../../services/project.service';
 import { BoardsService } from '../../services/board.service';
 import { TasksService } from '../../services/task.service';
 import BoardCard from '../../components/BoardCard';
+import { useSetCurrentProjectState } from '../../store/hooks';
 
 const Boards = () => {
 
@@ -25,14 +24,14 @@ const Boards = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
   const [openEditTask, setOpenEditTask] = useState<boolean>(false);
-  const [currentEditableTask, setCurrentEditableTask] = useState('');
+  const [currentEditableTask, setCurrentEditableTask] = useState<ITask>();
   const [openDeleteTask, setOpenDeleteTask] = useState<boolean>(false);
   const [currentDeleteTaskId, setCurrentDeleteTaskId] = useState<ITask | null>(null);
 
   const [isLoadingActionTask, setIsLoadingActionTask] = useState<boolean>(false);
   const [reloadBoards, setReloadBoards] = useState<boolean>(false);
 
-  const dispatch = useDispatch();
+  const setCurrentProject = useSetCurrentProjectState();
 
   const { id } = useParams();
 
@@ -61,7 +60,7 @@ const Boards = () => {
       projectsService.getOneProject(Number(id))
         .then((project: IProject) => {
           setProject(project);
-          dispatch(setProjectNameNavbar(project.title));
+          setCurrentProject(project);
         })
     ]).then(() => {
       setIsLoading(false);
@@ -98,7 +97,7 @@ const Boards = () => {
         return;
     }
 
-    setCurrentEditableTask(task.name);
+    setCurrentEditableTask(task);
     setOpenEditTask(!openEditTask);
   }
 

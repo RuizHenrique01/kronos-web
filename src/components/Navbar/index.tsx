@@ -4,16 +4,13 @@ import Avatar from '@mui/material/Avatar';
 import { useEffect, useState } from 'react';
 import styles from './navbar.module.css';
 import { useLocation } from 'react-router';
-import { useGetSystemState, useGetUserState } from '../../store/hooks';
+import { useGetCurrentProjectState, useGetSystemState, useGetUserState } from '../../store/hooks';
 import { AuthenticateService } from '../../services/authenticate.service';
 
 const Navbar = () => {
 
     const authenticateService = new AuthenticateService();
-    //const projectName = useSelector(state => state.navbar.projectName)
-    
-    const projectName = 'Teste';
-
+    const projectName = useGetCurrentProjectState().title;
     const userStore = useGetUserState();
     const systemStore = useGetSystemState();
     const location = useLocation(); 
