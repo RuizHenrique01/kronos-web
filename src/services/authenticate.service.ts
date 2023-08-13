@@ -39,6 +39,7 @@ export class AuthenticateService {
     setToken(token: string) {
         localStorage.removeItem('token');
         localStorage.setItem('token', token);
+        api.defaults.headers.Authorization = 'Bearer ' + token;
     }
 
     decodeToken(token: string) {
@@ -54,7 +55,7 @@ export class AuthenticateService {
 
     isValidToken(token: string) {
         if (!token) return false;
-
+        api.defaults.headers.Authorization = null;
         return true;
     }
 

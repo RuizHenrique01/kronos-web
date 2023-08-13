@@ -54,6 +54,7 @@ const Login = () => {
 
         userService.getUser()
           .then((user) => {
+            console.log("USER", user)
             setUserState({
               id: user.id,
               name: user.name,
