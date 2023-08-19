@@ -1,16 +1,18 @@
 import { Avatar, Card, CardContent, CardHeader, Typography } from '@mui/material';
 import styles from './boardCard.module.css';
 import { Delete, Edit } from '@mui/icons-material';
-import { ITask } from '../../interfaces';
+import { IBoard, ITask } from '../../interfaces';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 interface IProps {
-    title: string;
-    tasks: Array<ITask>;
-    openEditTask: (task: ITask) => void; 
-    openDeleteTask: (task: ITask) => void;
+  title: string;
+  tasks: Array<ITask>;
+  openEditTask: (task: ITask) => void;
+  openDeleteTask: (task: ITask) => void;
+  board: IBoard;
 }
 
-const BoardCard = ({ title, tasks, openEditTask, openDeleteTask }: IProps) => {
+const BoardCard = ({ title, tasks, openEditTask, openDeleteTask, board }: IProps) => {
 
   function stringToColor(string: string) {
     let hash = 0;
@@ -66,125 +68,144 @@ const BoardCard = ({ title, tasks, openEditTask, openDeleteTask }: IProps) => {
 
       </CardHeader>
 
-      <CardContent className={styles.card_content} sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '25px',
-        margin: '72px 0',
-        overflow: 'auto',
-        height: 'calc(100% - 80px)',
-      }} >
-        {
-          tasks.length ? tasks.map((task: ITask) => (
-
-            <div key={task.id} style={{
-              backgroundColor: '#ffff',
-              padding: '20px',
-              borderRadius: 8,
-              maxHeight: 260,
+      <Droppable droppableId={`${board.id}`}>
+        {(provided) => (
+          <CardContent
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className={styles.card_content} sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 15,
-            }}>
-              <Typography variant="h5" sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontSize: 18,
-                fontWeight: 600,
-                maxHeight: '50px',
-                // overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }} component="div">
-                <span
-                  style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >{task.name}</span>
-                <div className={styles.task_actions}>
-                  <button
-                    className={styles.edit}
-                    type='button'
-                    onClick={() => openEditTask(task)}
-                  >
-                    <Edit sx={{
-                      color: '#7C7C7C',
-                      fontSize: '1em'
-                    }} />
-                  </button>
-                  <button
-                    className={styles.delete}
-                    type='button'
-                    onClick={() => openDeleteTask(task!)}
-                  >
-                    <Delete sx={{
-                      color: '#7C7C7C',
-                      fontSize: '1em'
-                    }} />
-                  </button>
-                </div>
-              </Typography>
+              gap: '25px',
+              margin: '72px 0',
+              overflow: 'auto',
+              height: 'calc(100% - 80px)',
+            }}
+          >
+            {
+              tasks.length ? tasks.map((task: ITask, index: number) => (
+                <Draggable
+                  key={task.id}
+                  index={index}
+                  draggableId={`draggable-${task.id}`}
+                >
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={{
+                        backgroundColor: '#ffff',
+                        padding: '20px',
+                        borderRadius: 8,
+                        maxHeight: 260,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 15,
+                        ...provided.draggableProps.style
+                      }}
+                    >
+                      <Typography variant="h5" sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: 18,
+                        fontWeight: 600,
+                        maxHeight: '50px',
+                        // overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }} component="div">
+                        <span
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >{task.name}</span>
+                        <div className={styles.task_actions}>
+                          <button
+                            className={styles.edit}
+                            type='button'
+                            onClick={() => openEditTask(task)}
+                          >
+                            <Edit sx={{
+                              color: '#7C7C7C',
+                              fontSize: '1em'
+                            }} />
+                          </button>
+                          <button
+                            className={styles.delete}
+                            type='button'
+                            onClick={() => openDeleteTask(task!)}
+                          >
+                            <Delete sx={{
+                              color: '#7C7C7C',
+                              fontSize: '1em'
+                            }} />
+                          </button>
+                        </div>
+                      </Typography>
 
-              <Typography sx={{
-                mb: 1.5,
-                flexGrow: 0,
-                maxHeight: '220px',
-                overflowY: 'auto',
-                textOverflow: 'ellipsis'
-              }} color="#756966">
-                {task.description}
-              </Typography>
+                      <Typography sx={{
+                        mb: 1.5,
+                        flexGrow: 0,
+                        maxHeight: '220px',
+                        overflowY: 'auto',
+                        textOverflow: 'ellipsis'
+                      }} color="#756966">
+                        {task.description}
+                      </Typography>
 
-              <div className={styles.card_footer}>
-                <Typography sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  color: '#043434',
-                  backgroundColor: '#058B8A4D',
-                  width: 'max-content',
-                  padding: '5px 10px',
-                  borderRadius: '8px',
-                  fontSize: '0.9em',
-                  fontWeight: 600,
-                  'p': {
-                    height: 'min-content'
-                  }
-                }} variant="body2">
-                  criado em: {new Date(task.createdAt!).toLocaleDateString('pt')}
-                </Typography>
-                <span
-                  title={`${task.User!.name.split(' ')[0]} ${task.User!.lastName}`}
-                  className={styles.owner_span}>
-                  <Avatar variant='circular' {...stringAvatar(`${task.User!.name.split(' ')[0]} ${task.User!.lastName}`)} />
-                </span>
-              </div>
+                      <div className={styles.card_footer}>
+                        <Typography sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: '#043434',
+                          backgroundColor: '#058B8A4D',
+                          width: 'max-content',
+                          padding: '5px 10px',
+                          borderRadius: '8px',
+                          fontSize: '0.9em',
+                          fontWeight: 600,
+                          'p': {
+                            height: 'min-content'
+                          }
+                        }} variant="body2">
+                          criado em: {new Date(task.createdAt!).toLocaleDateString('pt')}
+                        </Typography>
+                        <span
+                          title={`${task.User!.name.split(' ')[0]} ${task.User!.lastName}`}
+                          className={styles.owner_span}>
+                          <Avatar variant='circular' {...stringAvatar(`${task.User!.name.split(' ')[0]} ${task.User!.lastName}`)} />
+                        </span>
+                      </div>
 
-            </div>
+                    </div>
+                  )}
+                </Draggable>
+              ))
+                : <>
 
-          ))
-            : <>
+                  <div className={styles.board_item}>
+                    <Typography sx={{
+                      display: 'flex',
+                      color: '#756966',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '10px',
+                      backgroundColor: '#FFF',
+                      borderRadius: '8px',
+                      mb: 1.5
+                    }} color="text.secondary">
+                      Não há tarefas em {title}
+                    </Typography>
+                  </div>
 
-              <div className={styles.board_item}>
-                <Typography sx={{
-                  display: 'flex',
-                  color: '#756966',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '10px',
-                  backgroundColor: '#FFF',
-                  borderRadius: '8px',
-                  mb: 1.5
-                }} color="text.secondary">
-                  Não há tarefas em {title}
-                </Typography>
-              </div>
+                </>
 
-            </>
-
-        }
-
-      </CardContent>
+            }
+          {provided.placeholder}
+          </CardContent>)}
+      </Droppable>
     </Card>
   )
 };

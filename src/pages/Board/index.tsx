@@ -1,7 +1,7 @@
 import { Add } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button, CircularProgress, Dialog, DialogContent } from '@mui/material';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from 'react-router';
 import styles from "./boards.module.css";
 import TaskForm from '../../components/TaskForm';
@@ -12,6 +12,20 @@ import { BoardsService } from '../../services/board.service';
 import { TasksService } from '../../services/task.service';
 import BoardCard from '../../components/BoardCard';
 import { useSetCurrentProjectState } from '../../store/hooks';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import groupBy from 'lodash.groupby';
+
+const reorder = (
+  list: Array<ITask>,
+  startIndex: number,
+  endIndex: number,
+) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
 
 const Boards = () => {
 
@@ -19,6 +33,7 @@ const Boards = () => {
   const projectsService = new ProjectsService();
   const tasksService = new TasksService();
   const [boards, setBoards] = useState<Array<IBoard>>([]);
+  const [tasks, setTasks] = useState<Array<ITask>>([]);
   const [filterBoards, setFilterBoards] = useState<Array<IBoard>>([]);
   const [project, setProject] = useState<IProject>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -36,7 +51,7 @@ const Boards = () => {
   const { id } = useParams();
 
   function search(value: string) {
-    const boardsFilteds = boards.map((board: IBoard)=> {
+    const boardsFilteds = boards.map((board: IBoard) => {
       const FilterBoard = {
         ...board,
         Tasks: board.Tasks?.filter(task => task.name.toLowerCase().includes(value.toLowerCase()))
@@ -54,7 +69,12 @@ const Boards = () => {
     Promise.all([
       boardsService.getAllboardsByProject(Number(id))
         .then((boards: Array<IBoard>) => {
+          const boardTask: Array<ITask> = [];
           setBoards(boards);
+          boards.forEach(b => {
+            return b.Tasks!.length > 0 ? boardTask.push(...b.Tasks!) : null;
+          });
+          setTasks(boardTask);
           setFilterBoards(boards);
         }),
       projectsService.getOneProject(Number(id))
@@ -66,7 +86,7 @@ const Boards = () => {
       setIsLoading(false);
     })
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reloadBoards]);
 
   function createTask(task: ITask) {
@@ -93,8 +113,8 @@ const Boards = () => {
 
   function handleEditTask(task: ITask) {
 
-    if(!task){
-        return;
+    if (!task) {
+      return;
     }
 
     setCurrentEditableTask(task);
@@ -104,8 +124,8 @@ const Boards = () => {
   function editTask(task: ITask) {
 
     let resultMessage: {
-        message: string;
-        variant: 'success' | 'error'
+      message: string;
+      variant: 'success' | 'error'
     } = {
       message: 'Tarefa editada com sucesso!',
       variant: 'success'
@@ -134,13 +154,13 @@ const Boards = () => {
 
   function deleteTask(task: ITask | null) {
 
-    if(!task || !task.id){
-        return;
+    if (!task || !task.id) {
+      return;
     }
 
     let resultMessage: {
-        message: string;
-        variant: 'success' | 'error'
+      message: string;
+      variant: 'success' | 'error'
     } = {
       message: 'Tarefa deletada com sucesso!',
       variant: 'success'
@@ -170,6 +190,81 @@ const Boards = () => {
     setOpenDeleteTask(true);
     setCurrentDeleteTaskId(task);
   }
+
+  const onDragEnd = useCallback(
+    (result: DropResult) => {
+      console.log("RESULT", result)
+      // dropped outside the list
+      if (!result.destination) {
+        return;
+      }
+
+      const itemsSplitByListIds = groupBy(tasks, (task: ITask) => {
+        return task.boardId;
+      });
+
+      if (
+        result.source.droppableId === result.destination.droppableId
+      ) {
+        // Items are in the same list, so just re-order the list array
+        const target =
+          itemsSplitByListIds[result.destination.droppableId];
+        const reordered: Array<ITask> = reorder(
+          [...target],
+          result.source.index,
+          result.destination.index,
+        );
+
+        // Get rid of old list and replace with updated one
+        const filteredCards = tasks.filter(
+          (task: ITask) => task.boardId?.toString() !== result.source.droppableId,
+        );
+
+        setTasks([...filteredCards, ...reordered]);
+
+      } else {
+        // Items are in different lists, so just change the item's boardId
+
+        const removeByIndex = (list: Array<ITask>, index: number) => [
+          ...list.slice(0, index),
+          ...list.slice(index + 1),
+        ];
+
+        const source = tasks.filter(
+          (task: ITask) => task.boardId?.toString() === result.source.droppableId,
+        );
+        const sourceWithoutDragged = removeByIndex(
+          source,
+          result.source.index,
+        );
+
+        const target = tasks.filter(
+          (task: ITask) =>
+            task.boardId?.toString() === result.destination!.droppableId,
+        );
+
+        const itemWithNewId: ITask = {
+          ...source[result.source.index],
+          boardId: Number(result.destination.droppableId),
+        };
+
+        target.splice(result.destination.index, 0, itemWithNewId);
+
+        const filteredCards = tasks.filter(
+          (task: ITask) =>
+            task.boardId?.toString() !== result.source.droppableId &&
+            task.boardId?.toString() !== result.destination!.droppableId,
+        );
+
+        setTasks([
+          ...filteredCards,
+          ...sourceWithoutDragged,
+          ...target,
+        ]);
+      }
+    },
+    [tasks],
+  );
 
   return (
 
@@ -332,17 +427,20 @@ const Boards = () => {
             </header>
 
             <div className={styles.boards_container}>
-              {
-                filterBoards.length ? filterBoards.map(board => (
-                  <BoardCard
-                    openDeleteTask={(task: ITask) => handleDeleteTask(task)} // Em breve ajeitar todos os props-drilling
-                    openEditTask={(task: ITask) => handleEditTask(task)} // Em breve ajeitar todos os props-drilling
-                    key={board.id}
-                    title={board.name}
-                    tasks={board.Tasks!}
-                  />
-                )) : null
-              }
+              <DragDropContext onDragEnd={onDragEnd}>
+                {
+                  filterBoards.length ? filterBoards.map(board => (
+                    <BoardCard
+                      openDeleteTask={(task: ITask) => handleDeleteTask(task)} // Em breve ajeitar todos os props-drilling
+                      openEditTask={(task: ITask) => handleEditTask(task)} // Em breve ajeitar todos os props-drilling
+                      key={board.id}
+                      title={board.name}
+                      tasks={tasks!.length > 0 ? tasks.filter(t => t.boardId === board.id) : []}
+                      board={board}
+                    />
+                  )) : null
+                }
+              </DragDropContext>
             </div>
 
           </>
