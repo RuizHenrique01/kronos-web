@@ -42,7 +42,7 @@ const Boards = () => {
   const [currentEditableTask, setCurrentEditableTask] = useState<ITask>();
   const [openDeleteTask, setOpenDeleteTask] = useState<boolean>(false);
   const [currentDeleteTaskId, setCurrentDeleteTaskId] = useState<ITask | null>(null);
-
+  const [search, setSearch] = useState<string>('');
   const [isLoadingActionTask, setIsLoadingActionTask] = useState<boolean>(false);
   const [reloadBoards, setReloadBoards] = useState<boolean>(false);
 
@@ -50,18 +50,8 @@ const Boards = () => {
 
   const { id } = useParams();
 
-  function search(value: string) {
-    const boardsFilteds = boards.map((board: IBoard) => {
-      const FilterBoard = {
-        ...board,
-        Tasks: board.Tasks?.filter(task => task.name.toLowerCase().includes(value.toLowerCase()))
-      }
-
-      return FilterBoard;
-    })
-
-    setFilterBoards([...boardsFilteds]);
-
+  function searchField(value: string) {
+    setSearch(value);
   }
 
   useEffect(() => {
@@ -192,8 +182,8 @@ const Boards = () => {
   }
 
   const onDragEnd = useCallback(
-    (result: DropResult) => {
-      console.log("RESULT", result)
+    async (result: DropResult) => {
+      let tasksData = [];
       // dropped outside the list
       if (!result.destination) {
         return;
@@ -220,7 +210,9 @@ const Boards = () => {
           (task: ITask) => task.boardId?.toString() !== result.source.droppableId,
         );
 
-        setTasks([...filteredCards, ...reordered]);
+        tasksData = [...filteredCards, ...reordered];
+
+        setTasks(tasksData);
 
       } else {
         // Items are in different lists, so just change the item's boardId
@@ -256,13 +248,18 @@ const Boards = () => {
             task.boardId?.toString() !== result.destination!.droppableId,
         );
 
-        setTasks([
+        tasksData = [
           ...filteredCards,
           ...sourceWithoutDragged,
           ...target,
-        ]);
+        ];
+
+        setTasks(tasksData);
       }
+
+      await tasksService.editTaskPositions(tasksData);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [tasks],
   );
 
@@ -396,7 +393,7 @@ const Boards = () => {
             <header>
               <div className={styles.sort_options}>
                 <div className={styles.input_search}>
-                  <input onChange={(e) => search(e.target.value)} placeholder='Pesquisar por atividade' type="text" />
+                  <input onChange={(e) => searchField(e.target.value)} placeholder='Pesquisar por atividade' type="text" />
                   <SearchIcon />
                 </div>
 
@@ -435,7 +432,7 @@ const Boards = () => {
                       openEditTask={(task: ITask) => handleEditTask(task)} // Em breve ajeitar todos os props-drilling
                       key={board.id}
                       title={board.name}
-                      tasks={tasks!.length > 0 ? tasks.filter(t => t.boardId === board.id) : []}
+                      tasks={tasks!.length > 0 ? tasks.filter(t => t.boardId === board.id && t.name.toLowerCase().includes(search.toLowerCase())) : []}
                       board={board}
                     />
                   )) : null

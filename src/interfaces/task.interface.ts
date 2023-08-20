@@ -10,5 +10,6 @@ export interface ITask {
 	updatedAt?: string;
 	boardId?: number,
 	ownerId?: number,
+	position?: number,
 	User?: IUser
 } 
