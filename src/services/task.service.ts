@@ -2,7 +2,7 @@ import api from "../api";
 import { ITask } from "../interfaces";
 
 export class TasksService {
-    constructor() {}
+    constructor() { }
 
     async createTaskByProject(task: ITask) {
         const createdTask = await api.post('/task', task);
@@ -10,12 +10,24 @@ export class TasksService {
     }
 
     async editTaskById(task: ITask) {
-        console.log(task);
-        const editedTask = await api.put(`/task/${task.id}`, {
+        const editedTask = await api.put(`/task/update/${task.id}`, {
             ...task,
             User: undefined
         });
         return editedTask;
+    }
+
+    async editTaskPositions(data: Array<ITask>) {
+        const editTasks = await api.put("/task/positions", {
+            tasks: data.map(d => {
+                return {
+                    id: d.id,
+                    position: d.position,
+                    boardId: d.boardId
+                }
+            })
+        });
+        return editTasks;
     }
 
     async deleteTaskById(id: number) {
