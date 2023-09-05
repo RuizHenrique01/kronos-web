@@ -22,4 +22,17 @@ export class SprintService {
         });
         return createdSprint;
     }
+
+    async editSprint(sprint: ISprint) {
+        const editedSprint = await api.put('/sprint/' + sprint.id, {
+            startDate: sprint.startDate,
+            endDate: sprint.endDate,
+        });
+        return editedSprint;
+    }
+
+    async endSprint(sprint: ISprint) {
+        const editedSprint = await api.put('/sprint/end/' + sprint.id);
+        return editedSprint;
+    }
 }

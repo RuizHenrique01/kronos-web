@@ -9,11 +9,13 @@ interface IProps {
     titleComponent?: string;
     buttonText?: string;
     handleSubmit: (sprint: ISprint) => void;
+    endSubmit?: (sprint: ISprint) => void;
     editableSprint?: ISprint;
 }
 
-const SprintForm = ({ titleComponent = "INICIE SUA SPRINT", buttonText = "Iniciar sprint", handleSubmit, editableSprint }: IProps) => {
+const SprintForm = ({ titleComponent = "INICIE SUA SPRINT", buttonText = "Iniciar sprint", handleSubmit, endSubmit, editableSprint }: IProps) => {
 
+    const [ isEnd, setIsEnd ] = useState<boolean>(false);
     const [sprint, setSprint] = useState(editableSprint ? {
         ...editableSprint,
         startDate: new Date(editableSprint.startDate!.split('T')[0]),
@@ -61,6 +63,16 @@ const SprintForm = ({ titleComponent = "INICIE SUA SPRINT", buttonText = "Inicia
         handleSubmit(sprintData);
     }
 
+    function onEndSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const sprintData: ISprint = {
+            ...sprint,
+            startDate: sprint.startDate.toISOString(),
+            endDate: sprint.endDate.toISOString()
+        }
+        endSubmit!(sprintData);
+    }
+
     function checkEndDate(date: Date) {
         const currentYear = new Date().getFullYear();
         const yearSelected = date.getFullYear();
@@ -79,7 +91,7 @@ const SprintForm = ({ titleComponent = "INICIE SUA SPRINT", buttonText = "Inicia
         <>
             <div className={`${styles.area} ${styles.formContainer}`}>
                 <div className={styles.form_div}>
-                    <form className={styles.formulario} onSubmit={e => onSubmit(e)}>
+                    <form className={styles.formulario} onSubmit={e => isEnd ? onEndSubmit(e) : onSubmit(e)}>
                         <h5>{titleComponent}</h5>
 
                         <input
@@ -126,9 +138,19 @@ const SprintForm = ({ titleComponent = "INICIE SUA SPRINT", buttonText = "Inicia
                         />
                         {(isSubmit && !isValidEndDate) && <InputError>A data de término está inválida.</InputError>}
 
-                        <button type="submit" className={styles.submitBtn}>
-                            <p>{buttonText}</p>
-                        </button>
+                        { editableSprint ?
+                            <div className={styles.boxOptions}>
+                                <button type="submit" className={styles.boxOptionsBtn} onClick={() => setIsEnd(false)}>
+                                    Salvar Alterações
+                                </button>
+                                <button type="submit" className={styles.boxOptionsBtn} onClick={() => setIsEnd(true)}>
+                                    Finalizar Sprint
+                                </button>
+                            </div> :
+                            <button type="submit" className={styles.submitBtn}>
+                                <p>{buttonText}</p>
+                            </button>
+                        }
                     </form>
                 </div>
             </div>

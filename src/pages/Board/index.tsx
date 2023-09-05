@@ -135,6 +135,68 @@ const Boards = () => {
       })
   }
 
+  function editSprint(sprint: ISprint) {
+
+    let resultMessage: {
+      message: string;
+      variant: 'success' | 'error'
+    } = {
+      message: 'Sprint editada com sucesso!',
+      variant: 'success'
+    }
+
+    setIsLoadingActionTask(true);
+
+    sprintService.editSprint(sprint)
+      .then(() => { })
+      .catch(() => {
+        resultMessage = {
+          message: 'Houve um error ao editar a Sprint!',
+          variant: 'error'
+        }
+
+      })
+      .finally(() => {
+        setTimeout(() => setIsLoadingActionTask(false), 500);
+        setOpenEditSprint(!openEditSprint);
+        enqueueSnackbar(resultMessage.message, {
+          variant: resultMessage.variant
+        });
+        setReloadBoards(!reloadBoards);
+      })
+  }
+
+  function endSprint(sprint: ISprint) {
+
+    let resultMessage: {
+      message: string;
+      variant: 'success' | 'error'
+    } = {
+      message: 'Sprint finalizada com sucesso!',
+      variant: 'success'
+    }
+
+    setIsLoadingActionTask(true);
+
+    sprintService.endSprint(sprint)
+      .then(() => { })
+      .catch(() => {
+        resultMessage = {
+          message: 'Houve um error ao finalizar a Sprint!',
+          variant: 'error'
+        }
+
+      })
+      .finally(() => {
+        setTimeout(() => setIsLoadingActionTask(false), 500);
+        setOpenEditSprint(!openEditSprint);
+        enqueueSnackbar(resultMessage.message, {
+          variant: resultMessage.variant
+        });
+        setReloadBoards(!reloadBoards);
+      })
+  }
+
   function handleEditTask(task: ITask) {
 
     if (!task) {
@@ -479,7 +541,8 @@ const Boards = () => {
                     :
                     <SprintForm
                       editableSprint={sprint!}
-                      handleSubmit={createSprint}
+                      handleSubmit={editSprint}
+                      endSubmit={endSprint}
                     />
                 }
               </DialogContent>

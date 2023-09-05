@@ -100,3 +100,30 @@
     border: 1px solid red;
     outline: 1px solid red;
   }
+
+  .boxOptions {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .boxOptionsBtn {
+    flex: 1;
+    color: #FFF
+  }
+
+  .boxOptionsBtn:hover {
+    color: rgba(5, 139, 138, 1);
+  }
+  
+  .boxOptionsBtn:nth-child(n + 2) {
+    background-color: white !important;
+    color: rgba(5, 139, 138, 1) !important;
+  }
+
+  .boxOptionsBtn:nth-child(n + 2):hover {
+    opacity: .7;
+    background-color: rgba(5, 139, 138, .1) !important;
+  }
+
+
