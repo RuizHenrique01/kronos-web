@@ -54,6 +54,13 @@ const SprintForm = ({ titleComponent = "INICIE SUA SPRINT", buttonText = "Inicia
             return;
         }
 
+        if (comparedDates(new Date(sprint.startDate) , new Date(sprint.endDate))) {
+            enqueueSnackbar("Campo 'Data término' é menor que a 'Data inicio'.", {
+                variant: "error"
+            })
+            return;
+        }
+
         const sprintData: ISprint = {
             ...sprint,
             startDate: sprint.startDate.toISOString(),
@@ -78,6 +85,10 @@ const SprintForm = ({ titleComponent = "INICIE SUA SPRINT", buttonText = "Inicia
         const yearSelected = date.getFullYear();
 
         return yearSelected >= currentYear;
+    }
+
+    function comparedDates(dateStart: Date, dateEnd: Date) {
+        return  dateStart > dateEnd;
     }
 
     function handleChange(event: ChangeEvent<HTMLTextAreaElement> | SelectChangeEvent<number>, key: string) {
