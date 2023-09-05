@@ -1,4 +1,4 @@
-import { Add } from '@mui/icons-material';
+import { Add, HourglassBottomOutlined, HourglassTop } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button, CircularProgress, Dialog, DialogContent } from '@mui/material';
 import { useEffect, useState, useCallback } from "react";
@@ -6,7 +6,7 @@ import { useParams } from 'react-router';
 import styles from "./boards.module.css";
 import TaskForm from '../../components/TaskForm';
 import { enqueueSnackbar } from 'notistack';
-import { IBoard, IProject, ITask } from '../../interfaces';
+import { IBoard, IProject, ISprint, ITask } from '../../interfaces';
 import { ProjectsService } from '../../services/project.service';
 import { BoardsService } from '../../services/board.service';
 import { TasksService } from '../../services/task.service';
@@ -14,6 +14,8 @@ import BoardCard from '../../components/BoardCard';
 import { useSetCurrentProjectState } from '../../store/hooks';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import groupBy from 'lodash.groupby';
+import SprintForm from '../../components/SprintForm';
+import { SprintService } from '../../services/sprint.service';
 
 const reorder = (
   list: Array<ITask>,
@@ -31,6 +33,7 @@ const Boards = () => {
 
   const boardsService = new BoardsService();
   const projectsService = new ProjectsService();
+  const sprintService = new SprintService();
   const tasksService = new TasksService();
   const [boards, setBoards] = useState<Array<IBoard>>([]);
   const [tasks, setTasks] = useState<Array<ITask>>([]);
@@ -45,6 +48,9 @@ const Boards = () => {
   const [search, setSearch] = useState<string>('');
   const [isLoadingActionTask, setIsLoadingActionTask] = useState<boolean>(false);
   const [reloadBoards, setReloadBoards] = useState<boolean>(false);
+  const [openCreateSprint, setOpenCreateSprint] = useState<boolean>(false);
+  const [sprint, setSprint] = useState<ISprint | null>(null);
+  const [openEditSprint, setOpenEditSprint] = useState<boolean>(false);
 
   const setCurrentProject = useSetCurrentProjectState();
 
@@ -66,6 +72,10 @@ const Boards = () => {
           });
           setTasks(boardTask);
           setFilterBoards(boards);
+        }),
+      sprintService.getSprintInProgress(Number(id))
+        .then((sprint: ISprint) => {
+          setSprint(sprint);
         }),
       projectsService.getOneProject(Number(id))
         .then((project: IProject) => {
@@ -98,6 +108,92 @@ const Boards = () => {
         setReloadBoards(!reloadBoards);
         setOpenCreateTask(false);
         setIsLoadingActionTask(false);
+      })
+  }
+
+  function createSprint(sprint: ISprint) {
+    setIsLoadingActionTask(true);
+    sprintService.createSprint({
+      title: sprint.title,
+      startDate: sprint.startDate,
+      endDate: sprint.endDate,
+    }, Number(id))
+      .then(() => {
+        enqueueSnackbar("Sprint iniciada com sucesso!", {
+          variant: 'success'
+        })
+      })
+      .catch(() => {
+        enqueueSnackbar("Houve um error ao iniciar a sprint!", {
+          variant: 'error'
+        });
+      })
+      .finally(() => {
+        setReloadBoards(!reloadBoards);
+        setOpenCreateSprint(false);
+        setIsLoadingActionTask(false);
+      })
+  }
+
+  function editSprint(sprint: ISprint) {
+
+    let resultMessage: {
+      message: string;
+      variant: 'success' | 'error'
+    } = {
+      message: 'Sprint editada com sucesso!',
+      variant: 'success'
+    }
+
+    setIsLoadingActionTask(true);
+
+    sprintService.editSprint(sprint)
+      .then(() => { })
+      .catch(() => {
+        resultMessage = {
+          message: 'Houve um error ao editar a Sprint!',
+          variant: 'error'
+        }
+
+      })
+      .finally(() => {
+        setTimeout(() => setIsLoadingActionTask(false), 500);
+        setOpenEditSprint(!openEditSprint);
+        enqueueSnackbar(resultMessage.message, {
+          variant: resultMessage.variant
+        });
+        setReloadBoards(!reloadBoards);
+      })
+  }
+
+  function endSprint(sprint: ISprint) {
+
+    let resultMessage: {
+      message: string;
+      variant: 'success' | 'error'
+    } = {
+      message: 'Sprint finalizada com sucesso!',
+      variant: 'success'
+    }
+
+    setIsLoadingActionTask(true);
+
+    sprintService.endSprint(sprint)
+      .then(() => { })
+      .catch(() => {
+        resultMessage = {
+          message: 'Houve um error ao finalizar a Sprint!',
+          variant: 'error'
+        }
+
+      })
+      .finally(() => {
+        setTimeout(() => setIsLoadingActionTask(false), 500);
+        setOpenEditSprint(!openEditSprint);
+        enqueueSnackbar(resultMessage.message, {
+          variant: resultMessage.variant
+        });
+        setReloadBoards(!reloadBoards);
       })
   }
 
@@ -390,6 +486,68 @@ const Boards = () => {
               </DialogContent>
             </Dialog>
 
+            <Dialog onClose={() => setOpenCreateSprint(!openCreateSprint)} open={openCreateSprint}>
+              <DialogContent
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {
+                  isLoadingActionTask ?
+                    <Box sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      width: '100%',
+                      height: '100%',
+                      background: 'transparent',
+                    }}>
+                      <CircularProgress sx={{
+                        color: 'var(--main-color)',
+                      }} />
+                    </Box>
+                    :
+                    <SprintForm
+                      handleSubmit={createSprint}
+                    />
+                }
+              </DialogContent>
+            </Dialog>
+
+            <Dialog onClose={() => setOpenEditSprint(!openEditSprint)} open={openEditSprint}>
+              <DialogContent
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {
+                  isLoadingActionTask ?
+                    <Box sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      width: '100%',
+                      height: '100%',
+                      background: 'transparent',
+                    }}>
+                      <CircularProgress sx={{
+                        color: 'var(--main-color)',
+                      }} />
+                    </Box>
+                    :
+                    <SprintForm
+                      editableSprint={sprint!}
+                      handleSubmit={editSprint}
+                      endSubmit={endSprint}
+                    />
+                }
+              </DialogContent>
+            </Dialog>
+
             <header>
               <div className={styles.sort_options}>
                 <div className={styles.input_search}>
@@ -417,6 +575,29 @@ const Boards = () => {
                     paddingTop: '3px'
                   }}>
                     Criar tarefa
+                  </span>
+                </Button>
+
+                <Button
+                  onClick={() => sprint ? setOpenEditSprint(!openEditSprint) : setOpenCreateSprint(!openCreateSprint)}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '5px',
+                    paddingRight: '15px',
+                    backgroundColor: '#FFF',
+                    color: 'var(--primary-color)',
+                    '&:hover': {
+                      backgroundColor: '#CECECE',
+                    }
+                  }}
+                >
+                  { sprint ? <HourglassTop /> : <HourglassBottomOutlined />}
+                  <span style={{
+                    paddingTop: '3px'
+                  }}>
+                   { sprint ? sprint.title : "Iniciar sprint" }
                   </span>
                 </Button>
 
