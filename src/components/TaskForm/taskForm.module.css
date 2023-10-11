@@ -96,3 +96,9 @@
     border: 1px solid red;
     outline: 1px solid red;
   }
+
+  .fileList {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+  }
