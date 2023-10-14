@@ -98,7 +98,10 @@
   }
 
   .fileList {
+    height: 536px;
     display: flex;
     flex: 1;
+    flex-direction: row;
+    padding-top: 8px;
     flex-wrap: wrap;
   }

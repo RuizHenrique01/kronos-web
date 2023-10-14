@@ -1,10 +1,11 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tab, Tabs } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tab, Tabs } from "@mui/material";
 import { ChangeEvent, useRef, useState } from "react";
 import styles from "./taskForm.module.css";
 import { enqueueSnackbar } from "notistack";
 import InputError from "../InputError";
 import { IBoard, ITask, IUsersIntegrated } from "../../interfaces";
-import { AttachFile, Info } from "@mui/icons-material";
+import { Add, AttachFile, Info } from "@mui/icons-material";
+import FileForm from "./components/FileForm";
 
 interface IProps {
   title?: string;
@@ -57,6 +58,7 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
   const [isValidEndDate] = useState<boolean>(true);
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
   const [tabValue, setTabValue] = useState(0);
+  const [isFileFormOpen, setIsFileFormOpen] = useState<boolean>(false);
 
   const boxRef = useRef<HTMLFormElement>(null);
 
@@ -100,9 +102,13 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
     });
   }
 
-  const handleTab = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTab = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  const handleFileFormOpen = () => {
+    setIsFileFormOpen(!isFileFormOpen);
+  }
 
   return (
     <>
@@ -224,8 +230,16 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
             </form>
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1}>
-            <div style={{height: boxRef.current?.clientHeight, overflowY: 'auto'}} className={styles.fileList}>
-
+            <FileForm isOpen={isFileFormOpen} handleOpen={handleFileFormOpen} taskId={task.id} />
+            <div style={{ minHeight: boxRef.current?.clientHeight, overflowY: 'auto' }} className={styles.fileList}>
+              <Button variant="outlined" startIcon={<Add />} sx={{
+                width: '35%',
+                height: '150px'
+              }}
+              onClick={handleFileFormOpen}
+              >
+                Adicionar
+              </Button>
             </div>
           </CustomTabPanel>
         </div>

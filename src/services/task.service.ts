@@ -34,4 +34,9 @@ export class TasksService {
         const deletedTask = await api.delete(`/task/${id}`);
         return deletedTask;
     }
+
+    async uploadFile(id: number, formData: FormData) {
+        const fileUpload = await api.post(`/task/${id}/upload`, formData)
+        return fileUpload
+    }
 }
