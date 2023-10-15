@@ -1,11 +1,12 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tab, Tabs } from "@mui/material";
-import { ChangeEvent, useRef, useState } from "react";
+import { Box, Button, FormControl, IconButton, InputLabel, ListItemIcon, Menu, MenuItem, Select, SelectChangeEvent, Tab, Tabs, Tooltip, Typography } from "@mui/material";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import styles from "./taskForm.module.css";
 import { enqueueSnackbar } from "notistack";
 import InputError from "../InputError";
-import { IBoard, ITask, IUsersIntegrated } from "../../interfaces";
-import { Add, AttachFile, Info } from "@mui/icons-material";
+import { IBoard, IFile, ITask, IUsersIntegrated } from "../../interfaces";
+import { Add, AttachFile, Delete, Download, Info, MoreVert } from "@mui/icons-material";
 import FileForm from "./components/FileForm";
+import { TasksService } from "../../services/task.service";
 
 interface IProps {
   title?: string;
@@ -42,6 +43,17 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
+const options = [
+  {
+    name: 'Download',
+    icon: <Download fontSize="small" />
+  },
+  {
+    name: 'Remover',
+    icon: <Delete fontSize="small" />
+  }
+];
+
 const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade", boards, users, handleSubmit, editableTask }: IProps) => {
 
   const [task, setTask] = useState(editableTask ? {
@@ -59,8 +71,19 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
   const [tabValue, setTabValue] = useState(0);
   const [isFileFormOpen, setIsFileFormOpen] = useState<boolean>(false);
+  const [files, setFiles] = useState<Array<IFile>>([]);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const boxRef = useRef<HTMLFormElement>(null);
+  const taskService = new TasksService();
+
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -108,6 +131,28 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
 
   const handleFileFormOpen = () => {
     setIsFileFormOpen(!isFileFormOpen);
+  }
+
+  useEffect(() => {
+    if (task.id) {
+      taskService.getAllFiles(task.id).then(data => setFiles(data));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFileFormOpen]);
+
+  const handleDownload = async (name: string) => {
+    try {
+      handleClose();
+      if (task.id){
+        const download  = await taskService.downloadFile(task.id, name);
+        return download
+      }
+    } catch(err) {
+      console.log(err)
+      enqueueSnackbar("Falha ao realizar o download do arquivo!", {
+        variant: "error"
+      })
+    }
   }
 
   return (
@@ -232,14 +277,75 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
           <CustomTabPanel value={tabValue} index={1}>
             <FileForm isOpen={isFileFormOpen} handleOpen={handleFileFormOpen} taskId={task.id} />
             <div style={{ minHeight: boxRef.current?.clientHeight, overflowY: 'auto' }} className={styles.fileList}>
-              <Button variant="outlined" startIcon={<Add />} sx={{
-                width: '35%',
-                height: '150px'
-              }}
-              onClick={handleFileFormOpen}
-              >
-                Adicionar
-              </Button>
+              <div className={styles.files}>
+
+                <Button variant="outlined" startIcon={<Add />} sx={{
+                  width: '30%',
+                  height: '150px'
+                }}
+                  onClick={handleFileFormOpen}
+                >
+                  Adicionar
+                </Button>
+                {
+                  files.map(file =>
+                    <Tooltip title={file.name} key={file.name}>
+                      <Box sx={{
+                        width: '30%',
+                        height: '150px',
+                        borderRadius: '4px',
+                        overflow: 'hidden'
+                      }}
+                        className={styles.fileItem}
+                      >
+                        <IconButton
+                          aria-label="more"
+                          id="long-button"
+                          aria-controls={open ? 'long-menu' : undefined}
+                          aria-expanded={open ? 'true' : undefined}
+                          aria-haspopup="true"
+                          onClick={handleClick}
+                          sx={{
+                            alignSelf: 'flex-end'
+                          }}
+                        >
+                          <MoreVert />
+                        </IconButton>
+                        <Menu
+                          id="long-menu"
+                          MenuListProps={{
+                            'aria-labelledby': 'long-button',
+                          }}
+                          anchorEl={anchorEl}
+                          open={open}
+                          onClose={handleClose}
+                          PaperProps={{
+                            style: {
+                              width: '16ch',
+                            },
+                          }}
+                        >
+                          {options.map((option) => (
+                            <MenuItem key={option.name} onClick={async () => { option.name === 'Download' ? await handleDownload(file.name) : alert('AAAA')}}>
+                              <ListItemIcon>
+                                {option.icon}
+                              </ListItemIcon>
+                              <Typography variant="inherit">{option.name}</Typography>
+                            </MenuItem>
+                          ))}
+                        </Menu>
+                        <Typography fontWeight="bold" component='h3'>{file.type.toUpperCase()}</Typography>
+                        <Typography sx={{
+                          width: "95%",
+                          textAlign: 'center',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                        }} component='span'>{file.name}</Typography>
+                      </Box>
+                      </Tooltip>)
+                }
+                    </div>
             </div>
           </CustomTabPanel>
         </div>
