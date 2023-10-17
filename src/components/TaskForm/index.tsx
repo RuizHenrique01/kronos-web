@@ -73,15 +73,29 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
   const [isFileFormOpen, setIsFileFormOpen] = useState<boolean>(false);
   const [files, setFiles] = useState<Array<IFile>>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [contextMenu, setContextMenu] = useState<{item: number; mouseX: number; mouseY: number;} | null>(null);
+  const [fileName, setFileName] = useState<string>();
 
   const boxRef = useRef<HTMLFormElement>(null);
   const taskService = new TasksService();
 
   const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+ 
+  const handleContextMenu = (item: number) => (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    setContextMenu(
+      contextMenu === null
+        ? {
+          item,
+          mouseX: event.clientX + 2,
+          mouseY: event.clientY - 6
+        }
+        : null
+    );
   };
+
   const handleClose = () => {
+    setContextMenu(null);
     setAnchorEl(null);
   };
 
@@ -138,18 +152,39 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
       taskService.getAllFiles(task.id).then(data => setFiles(data));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFileFormOpen]);
+  }, [isFileFormOpen, anchorEl, contextMenu]);
 
   const handleDownload = async (name: string) => {
     try {
       handleClose();
-      if (task.id){
-        const download  = await taskService.downloadFile(task.id, name);
+      if (task.id) {
+        const download = await taskService.downloadFile(task.id, name);
+        const url = window.URL.createObjectURL(new Blob([download]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', name);
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(url);
         return download
       }
-    } catch(err) {
+    } catch (err) {
       console.log(err)
       enqueueSnackbar("Falha ao realizar o download do arquivo!", {
+        variant: "error"
+      })
+    }
+  }
+
+  const handleRemoveUpload = async (name: string) => {
+    try {
+      handleClose();
+      if (task.id) {
+        const download = await taskService.removeFile(task.id, name);
+        return download
+      }
+    } catch (err) {
+      enqueueSnackbar("Falha ao realizar a remoção do arquivo!", {
         variant: "error"
       })
     }
@@ -288,52 +323,33 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
                   Adicionar
                 </Button>
                 {
-                  files.map(file =>
-                    <Tooltip title={file.name} key={file.name}>
+                  files.map((file, i) =>
+                    <Tooltip title={file.name} key={i}>
                       <Box sx={{
                         width: '30%',
                         height: '150px',
                         borderRadius: '4px',
                         overflow: 'hidden'
                       }}
+                        key={i}
                         className={styles.fileItem}
                       >
                         <IconButton
                           aria-label="more"
-                          id="long-button"
                           aria-controls={open ? 'long-menu' : undefined}
                           aria-expanded={open ? 'true' : undefined}
                           aria-haspopup="true"
-                          onClick={handleClick}
+                          onContextMenu={handleContextMenu(i)}
+                          onClick={(e) => {
+                            handleContextMenu(i)(e)
+                            setFileName(file.name)
+                          }}
                           sx={{
                             alignSelf: 'flex-end'
                           }}
                         >
                           <MoreVert />
                         </IconButton>
-                        <Menu
-                          id="long-menu"
-                          MenuListProps={{
-                            'aria-labelledby': 'long-button',
-                          }}
-                          anchorEl={anchorEl}
-                          open={open}
-                          onClose={handleClose}
-                          PaperProps={{
-                            style: {
-                              width: '16ch',
-                            },
-                          }}
-                        >
-                          {options.map((option) => (
-                            <MenuItem key={option.name} onClick={async () => { option.name === 'Download' ? await handleDownload(file.name) : alert('AAAA')}}>
-                              <ListItemIcon>
-                                {option.icon}
-                              </ListItemIcon>
-                              <Typography variant="inherit">{option.name}</Typography>
-                            </MenuItem>
-                          ))}
-                        </Menu>
                         <Typography fontWeight="bold" component='h3'>{file.type.toUpperCase()}</Typography>
                         <Typography sx={{
                           width: "95%",
@@ -343,9 +359,37 @@ const TaskForm = ({ title = "CRIE SUA ATIVIDADE", buttonText = "Criar atividade"
                           overflow: 'hidden',
                         }} component='span'>{file.name}</Typography>
                       </Box>
-                      </Tooltip>)
+                    </Tooltip>)
                 }
-                    </div>
+                <Menu
+                  MenuListProps={{
+                    'aria-labelledby': 'long-button',
+                  }}
+                  open={contextMenu != null}
+                  onClose={() => handleClose()}
+                  anchorReference="anchorPosition"
+                  anchorPosition={
+                    contextMenu != null
+                      ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                      : undefined
+                  }
+                  anchorEl={anchorEl}
+                  PaperProps={{
+                    style: {
+                      width: '16ch',
+                    },
+                  }}
+                >
+                  {options.map((option) => (
+                    <MenuItem key={option.name} onClick={async () => { option.name === 'Download' ? await handleDownload(fileName!) : await handleRemoveUpload(fileName!) }}>
+                      <ListItemIcon>
+                        {option.icon}
+                      </ListItemIcon>
+                      <Typography variant="inherit">{option.name}</Typography>
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </div>
             </div>
           </CustomTabPanel>
         </div>

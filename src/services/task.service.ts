@@ -49,4 +49,9 @@ export class TasksService {
         const fileUpload = (await api.get(`/task/${id}/upload/${name}`)).data
         return fileUpload
     }
+
+    async removeFile(id: number, name: string) {
+        const fileUpload = (await api.delete(`/task/${id}/upload/${name}`)).data
+        return fileUpload
+    }
 }
