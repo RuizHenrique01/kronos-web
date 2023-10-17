@@ -96,3 +96,51 @@
     border: 1px solid red;
     outline: 1px solid red;
   }
+
+  .fileList {
+    height: 536px;
+  }
+
+  .fileList::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  /* Track */
+  .fileList::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+   
+  /* Handle */
+  .fileList::-webkit-scrollbar-thumb {
+    background: var(--main-color); 
+    border-radius: 16px;
+  }
+  
+  /* Handle on hover */
+  .fileList::-webkit-scrollbar-thumb:hover {
+    background: var(--main-color); 
+  }
+  
+  .files {
+    display: flex;
+    flex-direction: row;
+    padding: 8px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .fileItem {
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    transition: color .5s ease-in;
+  }
+
+  .fileItem:hover {
+    color: var(--main-color);
+    border: 1px solid var(--main-color);
+  }

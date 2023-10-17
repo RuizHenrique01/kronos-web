@@ -1,5 +1,5 @@
 import api from "../api";
-import { ITask } from "../interfaces";
+import { IFile, ITask } from "../interfaces";
 
 export class TasksService {
     constructor() { }
@@ -33,5 +33,25 @@ export class TasksService {
     async deleteTaskById(id: number) {
         const deletedTask = await api.delete(`/task/${id}`);
         return deletedTask;
+    }
+
+    async uploadFile(id: number, formData: FormData) {
+        const fileUpload = await api.post(`/task/${id}/upload`, formData)
+        return fileUpload
+    }
+
+    async getAllFiles(id: number) {
+        const allFiles = (await api.get<Array<IFile>>(`/task/${id}/files`)).data;
+        return allFiles
+    }
+
+    async downloadFile(id: number, name: string) {
+        const fileUpload = (await api.get(`/task/${id}/upload/${name}`)).data
+        return fileUpload
+    }
+
+    async removeFile(id: number, name: string) {
+        const fileUpload = (await api.delete(`/task/${id}/upload/${name}`)).data
+        return fileUpload
     }
 }

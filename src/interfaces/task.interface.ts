@@ -13,3 +13,8 @@ export interface ITask {
 	position?: number,
 	User?: IUser
 } 
+
+export interface IFile {
+	name: string;
+	type: string;
+}
