@@ -1,0 +1,8 @@
+version: "3.0"
+services:
+    frontend:
+        build: .
+        image: kronos-web
+        container_name: kronos-web
+        ports:
+          - "5173:5173"
