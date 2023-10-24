@@ -219,6 +219,8 @@ const Boards = () => {
 
     setIsLoadingActionTask(true);
 
+    delete task.files;
+
     tasksService.editTaskById(task)
       .then(() => { })
       .catch(() => {

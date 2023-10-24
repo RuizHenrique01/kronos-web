@@ -11,7 +11,8 @@ export interface ITask {
 	boardId?: number,
 	ownerId?: number,
 	position?: number,
-	User?: IUser
+	User?: IUser,
+	files?: Array<unknown>,
 } 
 
 export interface IFile {
