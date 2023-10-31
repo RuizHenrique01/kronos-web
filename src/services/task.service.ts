@@ -46,7 +46,9 @@ export class TasksService {
     }
 
     async downloadFile(id: number, name: string) {
-        const fileUpload = (await api.get(`/task/${id}/upload/${name}`)).data
+        const fileUpload = (await api.get(`/task/${id}/upload/${name}`, {
+            responseType: 'blob'
+        })).data
         return fileUpload
     }
 
