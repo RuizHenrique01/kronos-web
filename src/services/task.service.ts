@@ -56,4 +56,8 @@ export class TasksService {
         const fileUpload = (await api.delete(`/task/${id}/upload/${name}`)).data
         return fileUpload
     }
+
+    async completeTask(id: number){
+        await api.put(`/task/${id}/complete`);
+    }
 }
