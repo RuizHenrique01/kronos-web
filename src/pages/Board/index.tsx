@@ -367,6 +367,8 @@ const Boards = () => {
 
         if(boardUpdate.name === 'Concluído'){
           await tasksService.completeTask(taskUpdated.id!);
+        } else {
+          await tasksService.completeTask(taskUpdated.id!, false);
         }
       }
 

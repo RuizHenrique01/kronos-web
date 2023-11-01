@@ -57,7 +57,7 @@ export class TasksService {
         return fileUpload
     }
 
-    async completeTask(id: number){
-        await api.put(`/task/${id}/complete`);
+    async completeTask(id: number, isComplete: boolean = true){
+        await api.put(`/task/${id}/complete?isComplete=${isComplete}`);
     }
 }

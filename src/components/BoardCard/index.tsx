@@ -156,22 +156,42 @@ const BoardCard = ({ title, tasks, openEditTask, openDeleteTask, board }: IProps
                       </Typography>
 
                       <div className={styles.card_footer}>
-                        <Typography sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          color: '#043434',
-                          backgroundColor: '#058B8A4D',
-                          width: 'max-content',
-                          padding: '5px 10px',
-                          borderRadius: '8px',
-                          fontSize: '0.9em',
-                          fontWeight: 600,
-                          'p': {
-                            height: 'min-content'
-                          }
-                        }} variant="body2">
-                          criado em: {new Date(task.createdAt!).toLocaleDateString('pt')}
-                        </Typography>
+                        <div>
+                          <Typography sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            color: '#043434',
+                            backgroundColor: '#058B8A4D',
+                            width: 'max-content',
+                            padding: '5px 10px',
+                            borderRadius: '8px',
+                            fontSize: '0.9em',
+                            fontWeight: 600,
+                            'p': {
+                              height: 'min-content'
+                            }
+                          }} variant="body2">
+                            criado em: {new Date(task.createdAt!).toLocaleDateString('pt')}
+                          </Typography>
+
+                          { board.name === 'Concluído' && <Typography sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            color: '#714f12',
+                            backgroundColor: '#f9fe8a',
+                            width: 'max-content',
+                            padding: '5px 10px',
+                            borderRadius: '8px',
+                            fontSize: '0.9em',
+                            mt: '8px',
+                            fontWeight: 600,
+                            'p': {
+                              height: 'min-content'
+                            }
+                          }} variant="body2">
+                            concluído em: {new Date(task.dateConclusion!).toLocaleDateString('pt')}
+                          </Typography>}
+                        </div>
                         <span
                           title={`${task.User!.name.split(' ')[0]} ${task.User!.lastName}`}
                           className={styles.owner_span}>
@@ -203,7 +223,7 @@ const BoardCard = ({ title, tasks, openEditTask, openDeleteTask, board }: IProps
                 </>
 
             }
-          {provided.placeholder}
+            {provided.placeholder}
           </CardContent>)}
       </Droppable>
     </Card>
