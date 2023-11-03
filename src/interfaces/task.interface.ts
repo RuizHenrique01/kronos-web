@@ -13,6 +13,7 @@ export interface ITask {
 	position?: number,
 	User?: IUser,
 	files?: Array<unknown>,
+	dateConclusion?: Date;
 } 
 
 export interface IFile {

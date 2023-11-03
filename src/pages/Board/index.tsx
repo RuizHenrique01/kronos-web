@@ -282,6 +282,7 @@ const Boards = () => {
   const onDragEnd = useCallback(
     async (result: DropResult) => {
       let tasksData = [];
+      let taskUpdated: ITask | null = null;
       // dropped outside the list
       if (!result.destination) {
         return;
@@ -323,6 +324,10 @@ const Boards = () => {
         const source = tasks.filter(
           (task: ITask) => task.boardId?.toString() === result.source.droppableId,
         );
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        taskUpdated = source[result.source.index];
+
         const sourceWithoutDragged = removeByIndex(
           source,
           result.source.index,
@@ -353,6 +358,18 @@ const Boards = () => {
         ];
 
         setTasks(tasksData);
+      }
+
+      if(taskUpdated) {
+        const boardUpdate = boards.filter(
+          (board: IBoard) => board.id?.toString() === result.destination!.droppableId,
+        )[0];
+
+        if(boardUpdate.name === 'Concluído'){
+          await tasksService.completeTask(taskUpdated.id!);
+        } else {
+          await tasksService.completeTask(taskUpdated.id!, false);
+        }
       }
 
       await tasksService.editTaskPositions(tasksData);
