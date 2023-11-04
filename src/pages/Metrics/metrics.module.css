@@ -1,0 +1,54 @@
+.metrics_section {
+
+    font-family: 'Inter', sans-serif;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: flex-start;
+
+    width: 100%;
+
+    /* border: 1px solid red; */
+    overflow-y: auto;
+
+}
+
+.metrics_section header .title {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    height: min-content;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.metrics_section header .title h1 {
+    text-align: start;
+    align-self: flex-start;
+
+    color: #043434;
+
+}
+
+.metrics_content {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 16px;
+    gap: 1%;
+    row-gap: 24px;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.metrics_content_box {
+    min-width: 450px !important;
+}
+
+@media screen and (max-width: 1024px) {
+    .metrics_content_box {
+        width: 100% !important;
+    }
+}
