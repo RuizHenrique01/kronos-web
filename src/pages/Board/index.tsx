@@ -373,6 +373,8 @@ const Boards = () => {
       }
 
       await tasksService.editTaskPositions(tasksData);
+
+      setReloadBoards(!reloadBoards);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [tasks],
