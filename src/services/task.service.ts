@@ -60,4 +60,14 @@ export class TasksService {
     async completeTask(id: number, isComplete: boolean = true){
         await api.put(`/task/${id}/complete?isComplete=${isComplete}`);
     }
+
+    async percentGraphic(id: number){
+     const data = (await api.get(`/task/percentGraphic/${id}`)).data;
+     return data;
+    }
+
+    async burndownGraphic(id: number){
+        const data = (await api.get(`/task/burndownGraphic/${id}`)).data;
+        return data;
+    }
 }
