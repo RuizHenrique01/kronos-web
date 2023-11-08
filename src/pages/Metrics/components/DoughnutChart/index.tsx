@@ -36,18 +36,18 @@ const DoughnutChart = ({labels, data}: IProps) => {
         maintainAspectRatio: true,
         plugins: {
             legend: {
-                position: 'left' as const,
+                position: 'bottom' as const,
                 fullSize: true,
                 labels: {
                     font: {
-                        size: 16,
-                        
+                        weight: 'bold'
                     },
+                    color: 'black',
                 }
             },
             title: {
                 display: true,
-                text: 'Gráfico de Burndown',
+                text: 'Percentual de tarefas por Status',
                 font: {
                     size: 18,
                 },

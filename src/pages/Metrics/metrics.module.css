@@ -47,7 +47,12 @@
     min-width: 450px !important;
 }
 
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 1124px) {
+
+    .metrics_content {
+        overflow-y: scroll;
+    }
+
     .metrics_content_box {
         width: 100% !important;
     }

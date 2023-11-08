@@ -49,9 +49,22 @@ const LineChart = ({labels, dataTotal, dataAcm}: IProps) => {
 
       options={{
         responsive: true,
+        scales: {
+          y:{
+            ticks:{
+              callback: function(value) {if (value % 1 === 0) {return value;}}
+            }
+          }
+        },
         plugins: {
           legend: {
             position: 'top' as const,
+            labels: {
+              font: {
+                  weight: 'bold'
+              },
+              color: 'black'
+          }
           },
           title: {
             display: true,
