@@ -13,6 +13,7 @@ import Members from './pages/Members';
 import Boards from './pages/Board';
 import PrivateGuardRoute from './guards/private.guard';
 import AuthGuardRoute from './guards/auth.guard';
+import Metrics from './pages/Metrics';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
 
 
               <Route path='membros' element={<Members />} />
+              <Route path='metricas' element={<Metrics />} />
             </Route>
           </Route>
 

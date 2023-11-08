@@ -64,7 +64,7 @@ const Navbar = () => {
 
     return (
         userStore && <nav className={styles.navbar}>
-            {(location.pathname.includes('membros') || location.pathname.includes('quadros')) &&
+            {(location.pathname.includes('membros') || location.pathname.includes('quadros') || location.pathname.includes('metricas')) &&
                 <h2>{projectName}</h2>
             }
             <div className={styles.profile_button}>

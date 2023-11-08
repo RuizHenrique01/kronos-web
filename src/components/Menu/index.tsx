@@ -5,7 +5,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import GroupIcon from '@mui/icons-material/Group';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { Assessment, Logout } from '@mui/icons-material';
+import { Assessment, Logout, StackedLineChart } from '@mui/icons-material';
 import logo from '../../assets/logo_cronos.png';
 import { AuthenticateService } from '../../services/authenticate.service';
 import { useGetMenuItemState } from '../../store/hooks';
@@ -56,17 +56,24 @@ const Menu = () => {
                     </button>
                 </li>
 
-                {(location.pathname.includes('quadros') || location.pathname.includes('membros')) && (<li>
+                {(location.pathname.includes('quadros') || location.pathname.includes('membros') || location.pathname.includes('metricas')) && (<li>
                     <button onClick={() => goTo('/quadros/' + menuItems.projectId)}>
                         <Assessment />
                         Quadros
                     </button>
                 </li>)}
 
-                { (location.pathname.includes('quadros') || location.pathname.includes('membros')) && (<li>
+                { (location.pathname.includes('quadros') || location.pathname.includes('membros') || location.pathname.includes('metricas')) && (<li>
                     <button onClick={() => goTo('membros')}>
                         <GroupIcon />
                         Membros
+                    </button>
+                </li>)}
+
+                { (location.pathname.includes('quadros') || location.pathname.includes('membros') || location.pathname.includes('metricas')) && (<li>
+                    <button onClick={() => goTo('metricas')}>
+                        <StackedLineChart />
+                        Métricas
                     </button>
                 </li>)}
             </ul>
