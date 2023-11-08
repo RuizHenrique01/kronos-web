@@ -50,7 +50,7 @@ const BarVerticalChart = ({ labels, dataTotal, dataAcm }: IProps) => {
             scales: {
                 y:{
                   ticks:{
-                    callback: function(value) {if (value % 1 === 0) {return value;}}
+                    callback: function(value) {if (Number(value) % 1 === 0) {return value;}}
                   }
                 }
             },

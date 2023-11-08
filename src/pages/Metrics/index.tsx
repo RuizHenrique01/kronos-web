@@ -15,11 +15,11 @@ const Metrics = () => {
 
     const [dataPercent, setDataPercent] = useState<{[key: string]: number}>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [dataBurndonw, setDataBurndonw] = useState<Array<any>>([]);
+    const [dataBurndonw, setDataBurndonw] = useState<Array<{"day": string, "progresso total": number, "progresso acumulado": number}>>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [dataCompare, setDataCompare] = useState<Array<any>>([]);
+    const [dataCompare, setDataCompare] = useState<Array<{"day": string, "tarefas planejadas": number, "tarefas concluídas": number}>>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [dataTotal, setDataTotal] = useState(null);
+    const [dataTotal, setDataTotal] = useState<{"Total de Tarefas": number, "Tarefas Concluídas": number}>();
 
     const taskService = new TasksService();
 
