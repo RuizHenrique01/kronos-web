@@ -13,7 +13,7 @@ const Metrics = () => {
     const project = useGetCurrentProjectState();
 
 
-    const [dataPercent, setDataPercent] = useState(null);
+    const [dataPercent, setDataPercent] = useState<{[key: string]: number}>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [dataBurndonw, setDataBurndonw] = useState<Array<any>>([]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,7 +59,7 @@ const Metrics = () => {
                         right: 8
                     }} />
                 </Tooltip>
-                {dataPercent && <DoughnutChart labels={Object.keys(dataPercent!).map(d => `${d} - ${((dataPercent[d] / Object.values(dataPercent!).reduce((a, b) => a + b)) * 100).toFixed(0)}%`
+                {dataPercent && <DoughnutChart labels={Object.keys(dataPercent!).map(d=> `${d} - ${((dataPercent[d] / Object.values(dataPercent!).reduce((a, b) => a + b)) * 100).toFixed(0)}%`
                 )} data={Object.values(dataPercent!)} />}
             </Box>
             <Box sx={
