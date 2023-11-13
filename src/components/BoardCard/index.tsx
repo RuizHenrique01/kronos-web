@@ -174,7 +174,7 @@ const BoardCard = ({ title, tasks, openEditTask, openDeleteTask, board }: IProps
                             criado em: {new Date(task.createdAt!).toLocaleDateString('pt')}
                           </Typography>
 
-                          { board.name === 'Concluído' && <Typography sx={{
+                          { (board.name === 'Concluído' &&  task.dateConclusion) && <Typography sx={{
                             display: 'flex',
                             alignItems: 'center',
                             color: '#714f12',
