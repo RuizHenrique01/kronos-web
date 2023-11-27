@@ -27,9 +27,7 @@
 .metrics_section header .title h1 {
     text-align: start;
     align-self: flex-start;
-
     color: #043434;
-
 }
 
 .metrics_content {
@@ -40,7 +38,23 @@
     gap: 1%;
     row-gap: 24px;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
+}
+
+
+.metrics_content::-webkit-scrollbar,
+.metrics_content::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    height: 7px;
+}
+
+.metrics_content::-webkit-scrollbar {
+    background-color: #cecece;
+}j
+
+.metrics_content::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
 }
 
 .metrics_content_box {
